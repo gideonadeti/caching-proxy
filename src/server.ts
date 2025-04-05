@@ -1,0 +1,36 @@
+import express, { Request, Response } from "express";
+import axios from "axios";
+import { getCache, setCache } from "./cache";
+
+export const startServer = async (port: number, origin: string) => {
+  const app = express();
+
+  app.get("*", async (req: Request, res: Response) => {
+    const path = req.originalUrl;
+    const cacheKey = `${origin}${path}`;
+
+    const cache = getCache(cacheKey);
+
+    if (cache) {
+      res.set("X-Cache", "HIT");
+      res.send(JSON.parse(cache));
+
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${origin}${path}`);
+
+      setCache(cacheKey, JSON.stringify(response.data));
+
+      res.set("X-Cache", "MISS");
+      res.send(response.data);
+    } catch (error) {
+      res.status(502).json({ error: "Error fetching from origin" });
+    }
+  });
+
+  app.listen(port, () => {
+    console.log(`Proxy running at http://localhost:${port}`);
+  });
+};
