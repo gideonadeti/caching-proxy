@@ -1,0 +1,21 @@
+{
+  "name": "caching-proxy",
+  "version": "1.0.0",
+  "description": "A CLI tool that starts a caching proxy server, forwards requests to an actual server, and cache the responses.",
+  "main": "./build/index.js",
+  "bin": {
+    "caching-proxy": "./build/index.js"
+  },
+  "scripts": {
+    "dev": "nodemon --watch src --exec ts-node ./src/index.ts",
+    "build": "tsc",
+    "start": "node ./build/index.js"
+  },
+  "author": "gideonadeti",
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
