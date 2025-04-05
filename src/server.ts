@@ -5,9 +5,15 @@ import { getCache, setCache } from "./cache";
 export const startServer = async (port: number, origin: string) => {
   const app = express();
 
-  app.get("*", async (req: Request, res: Response) => {
-    const path = req.originalUrl;
-    const cacheKey = `${origin}${path}`;
+  app.get("/{*splat}", async (req: Request, res: Response) => {
+    const splat = req.params.splat as unknown as string[] | undefined;
+    let cacheKey = `${origin}`;
+    let endPoint = "";
+
+    if (splat !== undefined) {
+      cacheKey += `:${splat.join(":")}`;
+      endPoint = `/${splat.join("/")}`;
+    }
 
     const cache = getCache(cacheKey);
 
@@ -19,7 +25,7 @@ export const startServer = async (port: number, origin: string) => {
     }
 
     try {
-      const response = await axios.get(`${origin}${path}`);
+      const response = await axios.get(`${origin}${endPoint}`);
 
       setCache(cacheKey, JSON.stringify(response.data));
 
@@ -31,6 +37,6 @@ export const startServer = async (port: number, origin: string) => {
   });
 
   app.listen(port, () => {
-    console.log(`Proxy running at http://localhost:${port}`);
+    console.log(`Proxy running at http://localhost:${port}\n`);
   });
 };
