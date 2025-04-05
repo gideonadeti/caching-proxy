@@ -32,7 +32,9 @@ export const startServer = async (port: number, origin: string) => {
       res.set("X-Cache", "MISS");
       res.send(response.data);
     } catch (error) {
-      res.status(502).json({ error: "Error fetching from origin" });
+      res
+        .status(502)
+        .json({ error: (error as Error).message || "Bad Gateway" });
     }
   });
 
